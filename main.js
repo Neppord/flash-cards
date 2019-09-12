@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.L.z === region.S.z)
+	if (region.L.z === region.R.z)
 	{
 		return 'on line ' + region.L.z;
 	}
-	return 'on lines ' + region.L.z + ' through ' + region.S.z;
+	return 'on lines ' + region.L.z + ' through ' + region.R.z;
 }
 
 
@@ -2310,6 +2310,89 @@ function _Platform_mergeExportsDebug(moduleName, obj, exports)
 				: _Platform_mergeExportsDebug(moduleName + '.' + name, obj[name], exports[name])
 			: (obj[name] = exports[name]);
 	}
+}
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
+
+
+
+function _Time_now(millisToPosix)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});
+
+function _Time_here()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2(elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
+
+
+function _Time_getZoneName()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
 }
 
 
@@ -3932,7 +4015,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 			{
 				_VirtualDom_divertHrefToApp = divertHrefToApp;
 				var doc = view(model);
-				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.ap);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.aq);
 				var patches = _VirtualDom_diff(currNode, nextNode);
 				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
 				currNode = nextNode;
@@ -4014,9 +4097,9 @@ function _Browser_application(impl)
 					var next = elm$url$Url$fromString(href).a;
 					sendToApp(onUrlRequest(
 						(next
-							&& curr.af === next.af
-							&& curr.W === next.W
-							&& curr.ac.a === next.ac.a
+							&& curr.ag === next.ag
+							&& curr.V === next.V
+							&& curr.ad.a === next.ad.a
 						)
 							? elm$browser$Browser$Internal(next)
 							: elm$browser$Browser$External(href)
@@ -4096,17 +4179,17 @@ var _Browser_decodeEvent = F2(function(decoder, event)
 function _Browser_visibilityInfo()
 {
 	return (typeof _VirtualDom_doc.hidden !== 'undefined')
-		? { au: 'hidden', aq: 'visibilitychange' }
+		? { av: 'hidden', ar: 'visibilitychange' }
 		:
 	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
-		? { au: 'mozHidden', aq: 'mozvisibilitychange' }
+		? { av: 'mozHidden', ar: 'mozvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.msHidden !== 'undefined')
-		? { au: 'msHidden', aq: 'msvisibilitychange' }
+		? { av: 'msHidden', ar: 'msvisibilitychange' }
 		:
 	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
-		? { au: 'webkitHidden', aq: 'webkitvisibilitychange' }
-		: { au: 'hidden', aq: 'visibilitychange' };
+		? { av: 'webkitHidden', ar: 'webkitvisibilitychange' }
+		: { av: 'hidden', ar: 'visibilitychange' };
 }
 
 
@@ -4187,10 +4270,10 @@ var _Browser_call = F2(function(functionName, id)
 function _Browser_getViewport()
 {
 	return {
-		aj: _Browser_getScene(),
-		am: {
-			G: _Browser_window.pageXOffset,
-			H: _Browser_window.pageYOffset,
+		ak: _Browser_getScene(),
+		an: {
+			F: _Browser_window.pageXOffset,
+			G: _Browser_window.pageYOffset,
 			x: _Browser_doc.documentElement.clientWidth,
 			s: _Browser_doc.documentElement.clientHeight
 		}
@@ -4226,13 +4309,13 @@ function _Browser_getViewportOf(id)
 	return _Browser_withNode(id, function(node)
 	{
 		return {
-			aj: {
+			ak: {
 				x: node.scrollWidth,
 				s: node.scrollHeight
 			},
-			am: {
-				G: node.scrollLeft,
-				H: node.scrollTop,
+			an: {
+				F: node.scrollLeft,
+				G: node.scrollTop,
 				x: node.clientWidth,
 				s: node.clientHeight
 			}
@@ -4264,16 +4347,16 @@ function _Browser_getElement(id)
 		var x = _Browser_window.pageXOffset;
 		var y = _Browser_window.pageYOffset;
 		return {
-			aj: _Browser_getScene(),
-			am: {
-				G: x,
-				H: y,
+			ak: _Browser_getScene(),
+			an: {
+				F: x,
+				G: y,
 				x: _Browser_doc.documentElement.clientWidth,
 				s: _Browser_doc.documentElement.clientHeight
 			},
-			ar: {
-				G: x + rect.left,
-				H: y + rect.top,
+			as: {
+				F: x + rect.left,
+				G: y + rect.top,
 				x: rect.width,
 				s: rect.height
 			}
@@ -4796,6 +4879,18 @@ var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (_n0) {
 	return elm$core$Platform$Sub$none;
 };
+var author$project$Card$verbenaBonarensis = {W: 'https://upload.wikimedia.org/wikipedia/commons/8/8f/Verbena_bonarensis.jpg', Y: 'Verbena Bonarensis', _: 'Jätteverbena'};
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
+var elm$random$Random$Generator = elm$core$Basics$identity;
+var elm$random$Random$constant = function (value) {
+	return function (seed) {
+		return _Utils_Tuple2(value, seed);
+	};
+};
+var author$project$Card$genDeck = elm$random$Random$constant(
+	_Utils_Tuple2(author$project$Card$verbenaBonarensis, _List_Nil));
 var author$project$Main$AskLatinName = F2(
 	function (a, b) {
 		return {$: 3, a: a, b: b};
@@ -4804,6 +4899,10 @@ var author$project$Main$AskName = F2(
 	function (a, b) {
 		return {$: 2, a: a, b: b};
 	});
+var author$project$Main$Init = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
 var author$project$Main$ShowCard = function (a) {
 	return {$: 1, a: a};
 };
@@ -4811,55 +4910,170 @@ var author$project$Main$ShowCardAnswer = F2(
 	function (a, b) {
 		return {$: 4, a: a, b: b};
 	});
+var elm$random$Random$Generate = elm$core$Basics$identity;
+var elm$core$Task$andThen = _Scheduler_andThen;
+var elm$core$Task$succeed = _Scheduler_succeed;
+var elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var elm$random$Random$next = function (_n0) {
+	var state0 = _n0.a;
+	var incr = _n0.b;
+	return A2(elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var elm$random$Random$initialSeed = function (x) {
+	var _n0 = elm$random$Random$next(
+		A2(elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _n0.a;
+	var incr = _n0.b;
+	var state2 = (state1 + x) >>> 0;
+	return elm$random$Random$next(
+		A2(elm$random$Random$Seed, state2, incr));
+};
+var elm$time$Time$Name = function (a) {
+	return {$: 0, a: a};
+};
+var elm$time$Time$Offset = function (a) {
+	return {$: 1, a: a};
+};
+var elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 0, a: a, b: b};
+	});
+var elm$time$Time$customZone = elm$time$Time$Zone;
+var elm$time$Time$Posix = elm$core$Basics$identity;
+var elm$time$Time$millisToPosix = elm$core$Basics$identity;
+var elm$time$Time$now = _Time_now(elm$time$Time$millisToPosix);
+var elm$time$Time$posixToMillis = function (_n0) {
+	var millis = _n0;
+	return millis;
+};
+var elm$random$Random$init = A2(
+	elm$core$Task$andThen,
+	function (time) {
+		return elm$core$Task$succeed(
+			elm$random$Random$initialSeed(
+				elm$time$Time$posixToMillis(time)));
+	},
+	elm$time$Time$now);
+var elm$core$Platform$sendToApp = _Platform_sendToApp;
+var elm$random$Random$step = F2(
+	function (_n0, seed) {
+		var generator = _n0;
+		return generator(seed);
+	});
+var elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a;
+			var rest = commands.b;
+			var _n1 = A2(elm$random$Random$step, generator, seed);
+			var value = _n1.a;
+			var newSeed = _n1.b;
+			return A2(
+				elm$core$Task$andThen,
+				function (_n2) {
+					return A3(elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2(elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var elm$random$Random$onSelfMsg = F3(
+	function (_n0, _n1, seed) {
+		return elm$core$Task$succeed(seed);
+	});
+var elm$random$Random$map = F2(
+	function (func, _n0) {
+		var genA = _n0;
+		return function (seed0) {
+			var _n1 = genA(seed0);
+			var a = _n1.a;
+			var seed1 = _n1.b;
+			return _Utils_Tuple2(
+				func(a),
+				seed1);
+		};
+	});
+var elm$random$Random$cmdMap = F2(
+	function (func, _n0) {
+		var generator = _n0;
+		return A2(elm$random$Random$map, func, generator);
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager(elm$random$Random$init, elm$random$Random$onEffects, elm$random$Random$onSelfMsg, elm$random$Random$cmdMap);
+var elm$random$Random$command = _Platform_leaf('Random');
+var elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return elm$random$Random$command(
+			A2(elm$random$Random$map, tagger, generator));
+	});
 var author$project$Main$update = F2(
 	function (msg, state) {
 		var nextState = function () {
-			var _n0 = _Utils_Tuple2(msg, state);
-			if (!_n0.a.$) {
-				var _n1 = _n0.a;
-				var current = _n1.a;
-				var deck = _n1.b;
+			var _n4 = _Utils_Tuple2(msg, state);
+			if (!_n4.a.$) {
+				var _n5 = _n4.a;
+				var current = _n5.a;
+				var deck = _n5.b;
 				return author$project$Main$ShowCard(
-					{P: current, R: deck, U: _List_Nil});
+					{H: current, Q: deck, T: _List_Nil});
 			} else {
-				switch (_n0.b.$) {
+				switch (_n4.b.$) {
 					case 0:
-						var _n2 = _n0.b;
+						var _n6 = _n4.b;
 						return author$project$Main$IntroScreen;
 					case 1:
-						var _n3 = _n0.a;
-						var showState = _n0.b.a;
+						var _n7 = _n4.a;
+						var showState = _n4.b.a;
 						return A2(
 							author$project$Main$AskName,
 							showState,
-							{F: ''});
+							{_: ''});
 					case 2:
-						var _n4 = _n0.a;
-						var _n5 = _n0.b;
-						var showState = _n5.a;
-						var name = _n5.b.F;
+						var _n8 = _n4.a;
+						var _n9 = _n4.b;
+						var showState = _n9.a;
+						var name = _n9.b._;
 						return A2(
 							author$project$Main$AskLatinName,
 							showState,
-							{Y: '', F: name});
+							{Y: '', _: name});
 					case 3:
-						var _n6 = _n0.a;
-						var _n7 = _n0.b;
-						var showState = _n7.a;
-						var askState = _n7.b;
+						var _n10 = _n4.a;
+						var _n11 = _n4.b;
+						var showState = _n11.a;
+						var askState = _n11.b;
 						return A2(author$project$Main$ShowCardAnswer, showState, askState);
 					default:
-						var _n8 = _n0.a;
-						var _n9 = _n0.b;
+						var _n12 = _n4.a;
+						var _n13 = _n4.b;
 						return author$project$Main$IntroScreen;
 				}
 			}
 		}();
-		return _Utils_Tuple2(nextState, elm$core$Platform$Cmd$none);
+		var nextCommand = function () {
+			var _n0 = _Utils_Tuple2(msg, state);
+			if ((_n0.a.$ === 1) && (!_n0.b.$)) {
+				var _n1 = _n0.a;
+				var _n2 = _n0.b;
+				return A2(
+					elm$random$Random$generate,
+					function (_n3) {
+						var current = _n3.a;
+						var deck = _n3.b;
+						return A2(author$project$Main$Init, current, deck);
+					},
+					author$project$Card$genDeck);
+			} else {
+				return elm$core$Platform$Cmd$none;
+			}
+		}();
+		return _Utils_Tuple2(nextState, nextCommand);
 	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
+var author$project$Main$Next = {$: 1};
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
@@ -4875,10 +5089,67 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$img = _VirtualDom_node('img');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
-var author$project$Main$view = function (_n0) {
-	return elm$html$Html$text('Hello world!');
+var elm$json$Json$Encode$string = _Json_wrap;
+var elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			elm$json$Json$Encode$string(string));
+	});
+var elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 0, a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var author$project$Main$view = function (state) {
+	switch (state.$) {
+		case 0:
+			return A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(author$project$Main$Next)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Börja')
+					]));
+		case 1:
+			var current = state.a.H;
+			return A2(
+				elm$html$Html$img,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$src(current.W),
+						elm$html$Html$Events$onClick(author$project$Main$Next)
+					]),
+				_List_Nil);
+		default:
+			return elm$html$Html$text('Hello world!');
+	}
 };
 var elm$browser$Browser$External = function (a) {
 	return {$: 1, a: a};
@@ -4897,7 +5168,6 @@ var elm$core$Basics$never = function (_n0) {
 	}
 };
 var elm$core$Task$Perform = elm$core$Basics$identity;
-var elm$core$Task$succeed = _Scheduler_succeed;
 var elm$core$Task$init = elm$core$Task$succeed(0);
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
@@ -4968,7 +5238,6 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$core$Task$andThen = _Scheduler_andThen;
 var elm$core$Task$map = F2(
 	function (func, taskA) {
 		return A2(
@@ -5001,7 +5270,6 @@ var elm$core$Task$sequence = function (tasks) {
 		elm$core$Task$succeed(_List_Nil),
 		tasks);
 };
-var elm$core$Platform$sendToApp = _Platform_sendToApp;
 var elm$core$Task$spawnCmd = F2(
 	function (router, _n0) {
 		var task = _n0;
@@ -5065,7 +5333,7 @@ var elm$core$String$contains = _String_contains;
 var elm$core$String$toInt = _String_toInt;
 var elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {V: fragment, W: host, aa: path, ac: port_, af: protocol, ag: query};
+		return {U: fragment, V: host, ab: path, ad: port_, ag: protocol, ah: query};
 	});
 var elm$url$Url$chompBeforePath = F5(
 	function (protocol, path, params, frag, str) {

@@ -1,14 +1,11 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (text)
-
-
-type alias Card =
-    { imgUrl : String
-    , name : String
-    , latinName : String
-    }
+import Card exposing (Card, genDeck)
+import Html exposing (button, img, text)
+import Html.Attributes exposing (src)
+import Html.Events exposing (onClick)
+import Random
 
 
 type alias ShowState =
@@ -56,8 +53,16 @@ update msg state =
 
                 ( Next, ShowCardAnswer _ _ ) ->
                     IntroScreen
+
+        nextCommand =
+            case ( msg, state ) of
+                ( Next, IntroScreen ) ->
+                    Random.generate (\( current, deck ) -> Init current deck) genDeck
+
+                _ ->
+                    Cmd.none
     in
-    ( nextState, Cmd.none )
+    ( nextState, nextCommand )
 
 
 subscriptions : State -> Sub msg
@@ -69,8 +74,20 @@ init () =
     ( IntroScreen, Cmd.none )
 
 
-view _ =
-    text "Hello world!"
+view state =
+    case state of
+        IntroScreen ->
+            button [ onClick Next ] [ text "Börja" ]
+
+        ShowCard { current } ->
+            img
+                [ src current.imgUrl
+                , onClick Next
+                ]
+                []
+
+        _ ->
+            text "Hello world!"
 
 
 main =
