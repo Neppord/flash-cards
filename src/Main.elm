@@ -3,7 +3,7 @@ module Main exposing (main)
 import Browser
 import Card exposing (Card, genDeck)
 import Html exposing (button, img, text)
-import Html.Attributes exposing (src)
+import Html.Attributes exposing (src, style, width)
 import Html.Events exposing (onClick)
 import Random
 
@@ -83,6 +83,7 @@ view state =
             img
                 [ src current.imgUrl
                 , onClick Next
+                , style "max-width" "100%"
                 ]
                 []
 
