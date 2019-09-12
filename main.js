@@ -5014,45 +5014,76 @@ var author$project$Main$update = F2(
 	function (msg, state) {
 		var nextState = function () {
 			var _n4 = _Utils_Tuple2(msg, state);
-			if (!_n4.a.$) {
-				var _n5 = _n4.a;
-				var current = _n5.a;
-				var deck = _n5.b;
-				return author$project$Main$ShowCard(
-					{H: current, Q: deck, T: _List_Nil});
-			} else {
-				switch (_n4.b.$) {
+			_n4$1:
+			while (true) {
+				switch (_n4.a.$) {
 					case 0:
-						var _n6 = _n4.b;
-						return author$project$Main$IntroScreen;
+						var _n5 = _n4.a;
+						var current = _n5.a;
+						var deck = _n5.b;
+						return author$project$Main$ShowCard(
+							{H: current, Q: deck, T: _List_Nil});
 					case 1:
-						var _n7 = _n4.a;
-						var showState = _n4.b.a;
-						return A2(
-							author$project$Main$AskName,
-							showState,
-							{_: ''});
-					case 2:
-						var _n8 = _n4.a;
-						var _n9 = _n4.b;
-						var showState = _n9.a;
-						var name = _n9.b._;
-						return A2(
-							author$project$Main$AskLatinName,
-							showState,
-							{Y: '', _: name});
-					case 3:
-						var _n10 = _n4.a;
-						var _n11 = _n4.b;
-						var showState = _n11.a;
-						var askState = _n11.b;
-						return A2(author$project$Main$ShowCardAnswer, showState, askState);
+						switch (_n4.b.$) {
+							case 0:
+								break _n4$1;
+							case 1:
+								var _n7 = _n4.a;
+								var showState = _n4.b.a;
+								return A2(
+									author$project$Main$AskName,
+									showState,
+									{_: ''});
+							case 2:
+								var _n9 = _n4.a;
+								var _n10 = _n4.b;
+								var showState = _n10.a;
+								var name = _n10.b._;
+								return A2(
+									author$project$Main$AskLatinName,
+									showState,
+									{Y: '', _: name});
+							case 3:
+								var _n12 = _n4.a;
+								var _n13 = _n4.b;
+								var showState = _n13.a;
+								var askState = _n13.b;
+								return A2(author$project$Main$ShowCardAnswer, showState, askState);
+							default:
+								var _n14 = _n4.a;
+								var _n15 = _n4.b;
+								return author$project$Main$IntroScreen;
+						}
 					default:
-						var _n12 = _n4.a;
-						var _n13 = _n4.b;
-						return author$project$Main$IntroScreen;
+						switch (_n4.b.$) {
+							case 0:
+								break _n4$1;
+							case 2:
+								var name = _n4.a.a;
+								var _n8 = _n4.b;
+								var showState = _n8.a;
+								return A2(
+									author$project$Main$AskName,
+									showState,
+									{_: name});
+							case 3:
+								var latinName = _n4.a.a;
+								var _n11 = _n4.b;
+								var showState = _n11.a;
+								var askState = _n11.b;
+								return A2(
+									author$project$Main$AskLatinName,
+									showState,
+									_Utils_update(
+										askState,
+										{Y: latinName}));
+							default:
+								return state;
+						}
 				}
 			}
+			var _n6 = _n4.b;
+			return author$project$Main$IntroScreen;
 		}();
 		var nextCommand = function () {
 			var _n0 = _Utils_Tuple2(msg, state);
@@ -5074,6 +5105,9 @@ var author$project$Main$update = F2(
 		return _Utils_Tuple2(nextState, nextCommand);
 	});
 var author$project$Main$Next = {$: 1};
+var author$project$Main$UpdateField = function (a) {
+	return {$: 2, a: a};
+};
 var elm$json$Json$Decode$map = _Json_map1;
 var elm$json$Json$Decode$map2 = _Json_map2;
 var elm$json$Json$Decode$succeed = _Json_succeed;
@@ -5090,7 +5124,9 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	}
 };
 var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$form = _VirtualDom_node('form');
 var elm$html$Html$img = _VirtualDom_node('img');
+var elm$html$Html$input = _VirtualDom_node('input');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$json$Json$Encode$string = _Json_wrap;
@@ -5101,6 +5137,7 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			elm$json$Json$Encode$string(string));
 	});
+var elm$html$Html$Attributes$placeholder = elm$html$Html$Attributes$stringProperty('placeholder');
 var elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		elm$html$Html$Attributes$stringProperty,
@@ -5109,6 +5146,7 @@ var elm$html$Html$Attributes$src = function (url) {
 };
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
 };
@@ -5126,52 +5164,19 @@ var elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		elm$json$Json$Decode$succeed(msg));
 };
-var author$project$Main$view = function (state) {
-	switch (state.$) {
-		case 0:
-			return A2(
-				elm$html$Html$button,
-				_List_fromArray(
-					[
-						elm$html$Html$Events$onClick(author$project$Main$Next)
-					]),
-				_List_fromArray(
-					[
-						elm$html$Html$text('Börja')
-					]));
-		case 1:
-			var current = state.a.H;
-			return A2(
-				elm$html$Html$img,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$src(current.W),
-						elm$html$Html$Events$onClick(author$project$Main$Next),
-						A2(elm$html$Html$Attributes$style, 'max-width', '100%')
-					]),
-				_List_Nil);
-		default:
-			return elm$html$Html$text('Hello world!');
-	}
+var elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
 };
-var elm$browser$Browser$External = function (a) {
+var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 1, a: a};
 };
-var elm$browser$Browser$Internal = function (a) {
-	return {$: 0, a: a};
-};
-var elm$browser$Browser$Dom$NotFound = elm$core$Basics$identity;
-var elm$core$Basics$never = function (_n0) {
-	never:
-	while (true) {
-		var nvr = _n0;
-		var $temp$_n0 = nvr;
-		_n0 = $temp$_n0;
-		continue never;
-	}
-};
-var elm$core$Task$Perform = elm$core$Basics$identity;
-var elm$core$Task$init = elm$core$Task$succeed(0);
+var elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
 var elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -5227,6 +5232,136 @@ var elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
+var elm$json$Json$Decode$field = _Json_decodeField;
+var elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3(elm$core$List$foldr, elm$json$Json$Decode$field, decoder, fields);
+	});
+var elm$json$Json$Decode$string = _Json_decodeString;
+var elm$html$Html$Events$targetValue = A2(
+	elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	elm$json$Json$Decode$string);
+var elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysStop,
+			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
+};
+var elm$html$Html$Events$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 2, a: a};
+};
+var elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var elm$html$Html$Events$onSubmit = function (msg) {
+	return A2(
+		elm$html$Html$Events$preventDefaultOn,
+		'submit',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysPreventDefault,
+			elm$json$Json$Decode$succeed(msg)));
+};
+var author$project$Main$view = function (state) {
+	switch (state.$) {
+		case 0:
+			return A2(
+				elm$html$Html$button,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onClick(author$project$Main$Next)
+					]),
+				_List_fromArray(
+					[
+						elm$html$Html$text('Börja')
+					]));
+		case 1:
+			var current = state.a.H;
+			return A2(
+				elm$html$Html$img,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$src(current.W),
+						elm$html$Html$Events$onClick(author$project$Main$Next),
+						A2(elm$html$Html$Attributes$style, 'max-width', '100%')
+					]),
+				_List_Nil);
+		case 2:
+			var name = state.b._;
+			return A2(
+				elm$html$Html$form,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onSubmit(author$project$Main$Next)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$value(name),
+								elm$html$Html$Attributes$placeholder('Namn'),
+								A2(elm$html$Html$Attributes$style, 'min-width', '100%'),
+								elm$html$Html$Events$onInput(author$project$Main$UpdateField)
+							]),
+						_List_Nil)
+					]));
+		case 3:
+			var latinName = state.b.Y;
+			return A2(
+				elm$html$Html$form,
+				_List_fromArray(
+					[
+						elm$html$Html$Events$onSubmit(author$project$Main$Next)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$value(latinName),
+								elm$html$Html$Attributes$placeholder('Vetenskapligt namn'),
+								A2(elm$html$Html$Attributes$style, 'min-width', '100%'),
+								elm$html$Html$Events$onInput(author$project$Main$UpdateField)
+							]),
+						_List_Nil)
+					]));
+		default:
+			return elm$html$Html$text('Hello world!');
+	}
+};
+var elm$browser$Browser$External = function (a) {
+	return {$: 1, a: a};
+};
+var elm$browser$Browser$Internal = function (a) {
+	return {$: 0, a: a};
+};
+var elm$browser$Browser$Dom$NotFound = elm$core$Basics$identity;
+var elm$core$Basics$never = function (_n0) {
+	never:
+	while (true) {
+		var nvr = _n0;
+		var $temp$_n0 = nvr;
+		_n0 = $temp$_n0;
+		continue never;
+	}
+};
+var elm$core$Task$Perform = elm$core$Basics$identity;
+var elm$core$Task$init = elm$core$Task$succeed(0);
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(

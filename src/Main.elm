@@ -2,9 +2,9 @@ module Main exposing (main)
 
 import Browser
 import Card exposing (Card, genDeck)
-import Html exposing (button, img, text)
-import Html.Attributes exposing (src, style, width)
-import Html.Events exposing (onClick)
+import Html exposing (button, form, img, input, text)
+import Html.Attributes exposing (placeholder, src, style, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Random
 
 
@@ -26,6 +26,7 @@ type State
 type Msg
     = Init Card (List Card)
     | Next
+    | UpdateField String
 
 
 update msg state =
@@ -45,14 +46,23 @@ update msg state =
                 ( Next, ShowCard showState ) ->
                     AskName showState { name = "" }
 
+                ( UpdateField name, AskName showState _ ) ->
+                    AskName showState { name = name }
+
                 ( Next, AskName showState { name } ) ->
                     AskLatinName showState { name = name, latinName = "" }
+
+                ( UpdateField latinName, AskLatinName showState askState ) ->
+                    AskLatinName showState { askState | latinName = latinName }
 
                 ( Next, AskLatinName showState askState ) ->
                     ShowCardAnswer showState askState
 
                 ( Next, ShowCardAnswer _ _ ) ->
                     IntroScreen
+
+                ( UpdateField _, _ ) ->
+                    state
 
         nextCommand =
             case ( msg, state ) of
@@ -86,6 +96,30 @@ view state =
                 , style "max-width" "100%"
                 ]
                 []
+
+        AskName _ { name } ->
+            form
+                [ onSubmit Next ]
+                [ input
+                    [ value name
+                    , placeholder "Namn"
+                    , style "min-width" "100%"
+                    , onInput UpdateField
+                    ]
+                    []
+                ]
+
+        AskLatinName _ { latinName } ->
+            form
+                [ onSubmit Next ]
+                [ input
+                    [ value latinName
+                    , placeholder "Vetenskapligt namn"
+                    , style "min-width" "100%"
+                    , onInput UpdateField
+                    ]
+                    []
+                ]
 
         _ ->
             text "Hello world!"
